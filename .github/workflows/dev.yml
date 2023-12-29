@@ -12,7 +12,7 @@ on:
 jobs:
 
   build:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     env:
       terraform_version: "1.6.2"
       AWS_ACCESS_KEY_ID: ${{ secrets.DEV_ACCESS_KEY }}
@@ -44,27 +44,11 @@ jobs:
       - name: "Format Terraform Template"
         run: terraform fmt
 
-      - name: "Get latest Prod AMI ID"
-        run: |
-          LATEST_AMI_ID=$(aws ec2 describe-images \
-            --owners self \
-            --filters 'Name=state,Values=available' \
-            'Name=tag:Project,Values=${var.project_name}' \
-            'Name=tag:Env,Values=${var.project_env}' \
-            'Name=name,Values=${var.project_name}-${var.project_env}-*' \
-            --query 'Images[0].ImageId' \
-            --output text)
-          echo "Latest AMI ID: $LATEST_AMI_ID"
-          echo "LATEST_AMI_ID=$LATEST_AMI_ID" >> $GITHUB_ENV
-
       - name: "Terraform Plan"
-        run: terraform plan \
-              -var-file="dev.tfvars" \
-              -var="ami_id=${{ env.LATEST_AMI_ID }}"
+        run: terraform plan -var-file=dev.tfvars
       
       - name: "Terraform Apply"
         run: |
           terraform apply \
           -auto-approve \
-          -var-file="dev.tfvars" \
-          -var="ami_id=${{ env.LATEST_AMI_ID }}"
+          -var-file=dev.tfvars

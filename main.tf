@@ -64,7 +64,7 @@ resource "aws_security_group" "access" {
 #--------------#
 
 resource "aws_instance" "frontend" {
-  ami = var.ami_id
+  ami = data.aws_ami.latest.id
   instance_type = var.instance_type
   key_name = aws_key_pair.auth_key.id
   vpc_security_group_ids = [aws_security_group.access.id]
