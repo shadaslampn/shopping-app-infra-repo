@@ -12,7 +12,7 @@ on:
 jobs:
 
   build:
-    runs-on: shad-self
+    runs-on: [self-hosted, Linux, X64]
     env:
       terraform_version: "1.6.2"
       AWS_ACCESS_KEY_ID: ${{ secrets.DEV_ACCESS_KEY }}
