@@ -54,7 +54,7 @@ resource "aws_security_group" "access" {
 
   tags = {
     Name = "${var.project_name}-${var.project_env}-access"
-	Project = var.project_name
+    Project = var.project_name
     Env = var.project_env
   }
 }
@@ -64,13 +64,13 @@ resource "aws_security_group" "access" {
 #--------------#
 
 resource "aws_instance" "frontend" {
-  ami = data.aws_ami.latest.id
+  ami = var.ami_id
   instance_type = var.instance_type
   key_name = aws_key_pair.auth_key.id
   vpc_security_group_ids = [aws_security_group.access.id]
   tags = {
     Name = "${var.project_name}-${var.project_env}-frontend"
-	Project = var.project_name
+    Project = var.project_name
     Env = var.project_env
 	
   }
