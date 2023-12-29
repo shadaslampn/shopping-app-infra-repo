@@ -12,7 +12,7 @@ on:
 jobs:
 
   build:
-    runs-on: [self-hosted, Linux, X64]
+    runs-on: self-hosted
     env:
       terraform_version: "1.6.2"
       AWS_ACCESS_KEY_ID: ${{ secrets.DEV_ACCESS_KEY }}
@@ -23,6 +23,10 @@ jobs:
 
       - name: "Checkout the repository"
         uses: actions/checkout@v3
+      
+      - name: "Nodejs installation"
+        run: /opt/nodejs/versions/node-v20.10.0/bin/node --version
+        run: /opt/nodejs/versions/node-v20.10.0/bin/npm install
 
       - name: "Terraform installation"
         uses: hashicorp/setup-terraform@v3
