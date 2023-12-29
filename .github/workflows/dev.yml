@@ -52,7 +52,6 @@ jobs:
             'Name=tag:Project,Values=${var.project_name}' \
             'Name=tag:Env,Values=${var.project_env}' \
             'Name=name,Values=${var.project_name}-${var.project_env}-*' \
-            --sort-by CreationDate,DESC \
             --query 'Images[0].ImageId' \
             --output text)
           echo "Latest AMI ID: $LATEST_AMI_ID"
