@@ -26,8 +26,8 @@ jobs:
       
       - name: "Nodejs installation"
         run: |
-          /opt/nodejs/versions/node-v20.10.0/bin/npm install \
-          /opt/nodejs/versions/node-v20.10.0/bin/npm init -y
+          /opt/nodejs/versions/node-v20.10.0/bin/npm init -y \
+          /opt/nodejs/versions/node-v20.10.0/bin/npm install
 
       - name: "Terraform installation"
         uses: hashicorp/setup-terraform@v3
