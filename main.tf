@@ -59,7 +59,7 @@ resource "aws_security_group" "access" {
   }
 }
 
-#--------------##
+#--------------#
 # EC2 Instance #
 #--------------#
 
