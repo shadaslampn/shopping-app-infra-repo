@@ -25,9 +25,11 @@ jobs:
         uses: actions/checkout@v3
       
       - name: "Nodejs installation"
-        run: |
-          /opt/nodejs/versions/node-v20.10.0/bin/npm init -y \
-          /opt/nodejs/versions/node-v20.10.0/bin/npm install
+        uses: actions/setup-node@v4
+        with:
+          node-version: 16
+      - name: "Nodejs dependencies"
+        run: npm install
 
       - name: "Terraform installation"
         uses: hashicorp/setup-terraform@v3
