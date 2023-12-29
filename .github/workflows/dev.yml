@@ -28,8 +28,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 16
-      - name: "Nodejs dependencies"
-        run: npm install
 
       - name: "Terraform installation"
         uses: hashicorp/setup-terraform@v3
