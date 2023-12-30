@@ -1,18 +1,23 @@
----
 name: "Prod Infra Build"
 
 on:
-  repository_dispatch:
-    types: [ prod-deploy-event ]
-    
-  push:
-    branches:
-      - prod
+  workflow_dispatch:
+    inputs:
+      instance_type:
+        type: choice
+        description: "instance type"
+        options:
+        - t2.micro
+        - t2.small
+      
+      ami_id:
+        type: string
+        description: "instance ami"
+        required: true
 
 jobs:
-
   build:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     env:
       terraform_version: "1.6.2"
       AWS_ACCESS_KEY_ID: ${{ secrets.PROD_ACCESS_KEY }}
@@ -20,7 +25,6 @@ jobs:
       AWS_DEFAULT_REGION: ${{ secrets.PROD_REGION }}
 
     steps:
-
       - name: "Checkout the repository"
         uses: actions/checkout@v3
 
@@ -44,11 +48,36 @@ jobs:
       - name: "Format Terraform Template"
         run: terraform fmt
 
+      - name: "Select AMI"
+        uses: peter-evans/aws-action-select-ami@v1
+        id: select-ami
+        with:
+          region: ${{ secrets.PROD_REGION }}
+          filters: |
+            {
+              "filters": [
+                { "Name": "tag:Name", "Values": ["Production-AMI"] },
+                { "Name": "state", "Values": ["available"] }
+              ]
+            }
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.PROD_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.PROD_SECRET_KEY }}
+
+      - name: "Set AMI ID in environment"
+        run: echo "SELECTED_AMI_ID=${{ steps.select-ami.outputs.selected-ami-id }}" >> $GITHUB_ENV
+
+      - name: "Get latest Prod AMI ID"
+        run: echo "Latest AMI ID: $SELECTED_AMI_ID"
+
       - name: "Terraform Plan"
-        run: terraform plan -var-file=prod.tfvars
-      
+        run: terraform plan \
+               -var "instance_type=${{ github.event.inputs.instance_type }}" \
+               -var "ami_id=${{ env.SELECTED_AMI_ID }}"
+
       - name: "Terraform Apply"
         run: |
           terraform apply \
-          -auto-approve \
-          -var-file=prod.tfvars
+            -var "instance_type=${{ github.event.inputs.instance_type }}" \
+            -var "ami_id=${{ env.SELECTED_AMI_ID }}" \
+            -auto-approve
