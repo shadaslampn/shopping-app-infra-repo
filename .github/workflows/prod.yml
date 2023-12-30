@@ -17,6 +17,7 @@ on:
         required: true
 
 jobs:
+
   build:
     runs-on: ubuntu-latest
     env:
@@ -26,6 +27,7 @@ jobs:
       AWS_DEFAULT_REGION: ${{ secrets.PROD_REGION }}
 
     steps:
+
       - name: "Checkout the repository"
         uses: actions/checkout@v3
 
@@ -49,36 +51,14 @@ jobs:
       - name: "Format Terraform Template"
         run: terraform fmt
 
-      - name: "Select AMI"
-        uses: peter-evans/aws-action-select-ami@v1
-        id: select-ami
-        with:
-          region: ${{ secrets.PROD_REGION }}
-          filters: |
-            {
-              "filters": [
-                { "Name": "tag:Name", "Values": ["Production-AMI"] },
-                { "Name": "state", "Values": ["available"] }
-              ]
-            }
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.PROD_ACCESS_KEY }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.PROD_SECRET_KEY }}
-
-      - name: "Set AMI ID in environment"
-        run: echo "SELECTED_AMI_ID=${{ steps.select-ami.outputs.selected-ami-id }}" >> $GITHUB_ENV
-
-      - name: "Get latest Prod AMI ID"
-        run: echo "Latest AMI ID: $SELECTED_AMI_ID"
-
       - name: "Terraform Plan"
         run: terraform plan \
                -var "instance_type=${{ github.event.inputs.instance_type }}" \
-               -var "ami_id=${{ env.SELECTED_AMI_ID }}"
+               -var "ami_id=${{ github.event.inputs.ami_id }}"
 
       - name: "Terraform Apply"
         run: |
           terraform apply \
             -var "instance_type=${{ github.event.inputs.instance_type }}" \
-            -var "ami_id=${{ env.SELECTED_AMI_ID }}" \
+            -var "ami_id=${{ github.event.inputs.ami_id }}" \
             -auto-approve
