@@ -54,11 +54,13 @@ jobs:
       - name: "Terraform Plan"
         run: terraform plan \
                -var "instance_type=${{ github.event.inputs.instance_type }}" \
-               -var "ami_id=${{ github.event.inputs.ami_id }}"
+               -var "ami_id=${{ github.event.inputs.ami_id }}" \
+               -var-file=prod.tfvars
 
       - name: "Terraform Apply"
         run: |
           terraform apply \
             -var "instance_type=${{ github.event.inputs.instance_type }}" \
             -var "ami_id=${{ github.event.inputs.ami_id }}" \
+            -var-file=prod.tfvars \
             -auto-approve
