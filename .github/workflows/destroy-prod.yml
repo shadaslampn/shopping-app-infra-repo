@@ -1,5 +1,5 @@
 ---
-name: "Prod Infra Build"
+name: "Destroy Prod Infra"
 
 on:
   workflow_dispatch:
